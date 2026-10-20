@@ -72,3 +72,40 @@ def test_send_without_recipient_shows_validation(authenticated_page):
             )
         )
     ).to_be_visible()
+
+
+
+def test_cc_recipient_control_opens(authenticated_page):
+    page = authenticated_page
+    page.goto("https://mail.proton.me/u/1/inbox")
+
+    page.get_by_role("button", name="New message").first.click()
+
+    composer = page.get_by_role("region", name="Composer: New message")
+    expect(composer).to_be_visible(timeout=15000)
+
+    cc_button = page.get_by_test_id("composer:recipients:cc-button")
+    expect(cc_button).to_be_visible()
+    cc_button.click()
+
+    expect(
+        composer.get_by_role("textbox", name="Cc")
+    ).to_be_visible(timeout=5000)
+
+
+def test_bcc_recipient_control_opens(authenticated_page):
+    page = authenticated_page
+    page.goto("https://mail.proton.me/u/1/inbox")
+
+    page.get_by_role("button", name="New message").first.click()
+
+    composer = page.get_by_role("region", name="Composer: New message")
+    expect(composer).to_be_visible(timeout=15000)
+
+    bcc_button = page.get_by_test_id("composer:recipients:bcc-button")
+    expect(bcc_button).to_be_visible()
+    bcc_button.click()
+
+    expect(
+        composer.get_by_role("textbox", name="Bcc")
+    ).to_be_visible(timeout=5000)
