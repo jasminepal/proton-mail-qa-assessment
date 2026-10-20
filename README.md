@@ -145,3 +145,37 @@ Tests that send real messages, schedule delivery, or modify mailbox data should 
 The latest reported full test run passed. The subsequent collection-only command confirmed that **10 tests are currently collected**.
 
 These results describe the current automated suite only; they do not establish that every workflow listed in the assessment scope has been automated or tested. Review the latest test report before submission.
+
+## Automation Quality Review
+
+### 1. Which tests did you deliberately choose NOT to automate, and why?
+
+I wouldn't automate everything just for the sake of increasing the test count. CAPTCHA, account recovery that requires external verification, and visual checks that need human judgment are better handled manually. I would also avoid depending on real email delivery in regular UI tests because delivery can be delayed for reasons unrelated to the application. These scenarios still need testing, but manual checks or separate integration tests would be more suitable.
+
+### 2. Which 5 tests would you run on every pull request? Which would you run nightly? Explain the trade-off.
+
+For every pull request, I would run these five checks:
+
+1. Login and authenticated mailbox access.
+2. Opening the inbox and verifying that it loads.
+3. Opening the compose window and checking required-field validation.
+4. Saving a draft and verifying that it can be reopened.
+5. Searching for a message using a unique keyword.
+
+These cover important user journeys and should give quick feedback when a change breaks something.
+
+At night, I would run the full suite, including attachment handling, CC/BCC controls, filters, scheduled-send controls, and additional search and draft scenarios. I would also add cross-browser runs when the environment supports them.
+
+The trade-off is execution time versus coverage. Pull request tests should be fast enough to run frequently, while nightly runs can take longer to catch issues across more scenarios. This is the execution strategy I would use as the suite grows.
+
+### 3. How would you diagnose a test that passes locally but fails intermittently in CI?
+
+I would start by checking the failure screenshot, logs, and Playwright trace if available. Then I would compare the local and CI environments, including browser versions, authentication state, test data, and execution speed. I would check whether the test is failing because an element appears late, data is being shared between tests, or the application itself is returning an error. After reproducing the issue, I would fix the cause rather than just increasing timeouts or adding retries.
+
+### 4. How would you reduce test-suite flakiness if the UI changes frequently?
+
+I would use stable locators, such as accessible roles and labels or test IDs, instead of selectors that depend heavily on the page structure. I would keep common interactions in page objects so a locator change can be fixed in one place. I would also use condition-based waits instead of fixed sleeps, assert meaningful outcomes, and make sure tests do not depend on the order in which they run. If a test becomes flaky after a UI change, I would check whether the locator is outdated or the actual behavior has changed before updating the test.
+
+### 5. How would you scale this suite from 20 tests to 200+ tests while keeping maintenance manageable?
+
+I would organize tests by feature, keep shared page interactions and fixtures reusable, and separate test data from test logic. I would group tests into smoke and regression suites so the right tests run at the right time. As the suite grows, I would use API-based setup where appropriate, parallel execution for independent tests, and CI reporting to identify recurring failures and slow tests. I would also review duplicate or low-value tests regularly. The goal would be to add useful coverage without making the suite slow, unreliable, or difficult to maintain.

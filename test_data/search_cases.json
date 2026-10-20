@@ -1,0 +1,12 @@
+[
+  {
+    "id": "SRC-01",
+    "description": "Search using a unique keyword",
+    "query": "assessment"
+  },
+  {
+    "id": "SRC-02",
+    "description": "Search using another keyword",
+    "query": "meeting"
+  }
+]
