@@ -11,9 +11,7 @@ class ComposePage:
         self.recipient = self.composer.get_by_role(
             "textbox", name="To"
         )
-        self.subject = self.composer.get_by_role(
-            "textbox", name="Subject"
-        )
+        self.subject = page.get_by_role("textbox", name="Subject")
         self.send_button = self.composer.get_by_role(
             "button", name="Send", exact=True
         )

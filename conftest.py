@@ -1,9 +1,8 @@
-
 from pathlib import Path
+
 import pytest
 
 AUTH_STATE = Path("auth/state.json")
-
 
 
 @pytest.hookimpl(hookwrapper=True)
@@ -12,15 +11,15 @@ def pytest_runtest_makereport(item, call):
     report = outcome.get_result()
 
     if report.when == "call" and report.failed:
-        page = item.funcargs.get("page")
+        page = (
+            item.funcargs.get("page")
+            or item.funcargs.get("authenticated_page")
+        )
 
         if page:
             evidence_dir = Path("reports/screenshots")
             evidence_dir.mkdir(parents=True, exist_ok=True)
-
-            screenshot_path = (
-                evidence_dir / f"{item.name}.png"
-            )
+            screenshot_path = evidence_dir / f"{item.name}.png"
 
             try:
                 page.screenshot(
@@ -32,13 +31,12 @@ def pytest_runtest_makereport(item, call):
                 print(f"\nCould not capture screenshot: {error}")
 
 
-
 @pytest.fixture
 def authenticated_page(browser):
-    """Reuse an existing authenticated session without logging in."""
+    """Reuse a local saved session without submitting the login form."""
     if not AUTH_STATE.is_file():
         pytest.skip(
-            "No saved session found. Authenticate manually when access is available."
+            "No saved session found. Run save_auth_state.py when access is available."
         )
 
     context = browser.new_context(storage_state=str(AUTH_STATE))

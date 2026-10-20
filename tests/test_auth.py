@@ -27,9 +27,6 @@ def test_sign_in_with_empty_fields(page):
     ).to_be_visible()
 
 
-@pytest.mark.skip(
-    reason="Temporarily disabled to avoid repeated authentication attempts"
-)
 def test_valid_login_reaches_mailbox(page):
     login = LoginPage(page)
     login.open()
